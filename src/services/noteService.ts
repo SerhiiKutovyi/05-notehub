@@ -9,7 +9,7 @@ export interface NotesProps {
 axios.defaults.baseURL = 'https://notehub-public.goit.study/api/notes';
 const NOTEHUB_TOKEN = import.meta.env.VITE_NOTEHUB_TOKEN;
 
-async function fetchNotes(page: number): Promise<NotesProps> {
+export async function fetchNotes(page: number): Promise<NotesProps> {
   const { data } = await axios.get<NotesProps>('', {
     params: {
       page: `${page}`,
@@ -23,4 +23,15 @@ async function fetchNotes(page: number): Promise<NotesProps> {
 
   return data;
 }
-export default fetchNotes;
+
+export async function createNote() {
+  const { data } = await axios.post('', {
+    params: {},
+    headers: {
+      accept: 'application/json',
+      Authorization: `Bearer ${NOTEHUB_TOKEN}`,
+    },
+  });
+
+  return data;
+}

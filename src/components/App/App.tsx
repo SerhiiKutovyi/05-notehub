@@ -1,17 +1,24 @@
 import { useState } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
+import { fetchNotes } from '../../services/noteService';
 import SearchBox from '../SearchBox/SearchBox';
 import Loading from '../Loading/Loading';
 import ErrorMessage from '../ErrorMessage/ErrorMessage';
 import NoteList from '../NoteList/NoteList';
-import fetchNotes from '../../services/noteService';
+import Pagination from '../Pagination/Pagination';
+import Modal from '../Modal/Modal';
+import NoteForm from '../NoteForm/NoteForm';
 
 import css from './App.module.css';
-import Pagination from '../Pagination/Pagination';
 
 function App() {
   const [page, setPage] = useState<number>(1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = () => setIsModalOpen(true);
+
+  const closeModal = () => setIsModalOpen(false);
 
   const { data, error, isLoading, isError, isSuccess } = useQuery({
     queryKey: ['notes', page],
@@ -21,8 +28,6 @@ function App() {
     placeholderData: keepPreviousData,
   });
 
-  console.log(data);
-
   return (
     <div className={css.app}>
       <header className={css.toolbar}>
@@ -30,7 +35,11 @@ function App() {
         {isSuccess && data && data.totalPages > 1 && (
           <Pagination data={data} setPage={setPage} page={page} />
         )}
-        {<button className={css.button}>Create note +</button>}
+        {
+          <button onClick={openModal} className={css.button}>
+            Create note +
+          </button>
+        }
       </header>
       <main>
         {isError && <ErrorMessage error={error} />}
@@ -39,6 +48,9 @@ function App() {
           <NoteList notes={data.notes} />
         )}
       </main>
+      {isModalOpen && (
+        <Modal onClose={closeModal}>{<NoteForm onClose={closeModal} />}</Modal>
+      )}
     </div>
   );
 }
