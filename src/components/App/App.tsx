@@ -15,6 +15,7 @@ import css from './App.module.css';
 function App() {
   const [page, setPage] = useState<number>(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  // const [isDisabled, setIsDisabled] = useState(false);
 
   const openModal = () => setIsModalOpen(true);
 
