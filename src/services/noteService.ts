@@ -6,14 +6,24 @@ export interface NotesProps {
   totalPages: number;
 }
 
-axios.defaults.baseURL = 'https://notehub-public.goit.study/api/notes';
+export interface CreateNoteProps {
+  title: string;
+  content: string;
+  tag: string;
+}
+
+axios.defaults.baseURL = 'https://notehub-public.goit.study/api';
 const NOTEHUB_TOKEN = import.meta.env.VITE_NOTEHUB_TOKEN;
 
-export async function fetchNotes(page: number): Promise<NotesProps> {
-  const { data } = await axios.get<NotesProps>('', {
+export async function fetchNotes(
+  page: number,
+  search: string
+): Promise<NotesProps> {
+  const { data } = await axios.get<NotesProps>('/notes', {
     params: {
       page: `${page}`,
       perPage: 12,
+      search: `${search}`,
     },
     headers: {
       accept: 'application/json',
@@ -24,14 +34,22 @@ export async function fetchNotes(page: number): Promise<NotesProps> {
   return data;
 }
 
-export async function createNote() {
-  const { data } = await axios.post('', {
-    params: {},
+export async function createNote(data: CreateNoteProps) {
+  const res = await axios.post<Note>('/notes', data, {
     headers: {
       accept: 'application/json',
       Authorization: `Bearer ${NOTEHUB_TOKEN}`,
     },
   });
 
-  return data;
+  return res.data;
+}
+
+export async function deleteNote(id: Note['id']) {
+  await axios.delete(`/notes/${id}`, {
+    headers: {
+      accept: 'application/json',
+      Authorization: `Bearer ${NOTEHUB_TOKEN}`,
+    },
+  });
 }

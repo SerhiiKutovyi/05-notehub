@@ -1,20 +1,16 @@
 import { useId } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
+import { createNote } from '../../services/noteService.ts';
 
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import type { FormikHelpers } from 'formik';
+import type { FormValuesProps, NoteFormProps } from '../../types/form.ts';
+import type { CreateNoteProps } from '../../services/noteService.ts';
 
 import * as Yup from 'yup';
 
 import css from './NoteForm.module.css';
-
-interface NoteFormProps {
-  onClose: () => void;
-}
-interface FormValuesProps {
-  title: string;
-  content: string;
-  tag: 'Todo' | 'Work' | 'Personal' | 'Meeting' | 'Shopping';
-}
 
 const INITIAL_VALUES: FormValuesProps = {
   title: '',
@@ -24,25 +20,44 @@ const INITIAL_VALUES: FormValuesProps = {
 
 const OrderFormSchema = Yup.object().shape({
   title: Yup.string()
-    .min(2, 'Title must be at least 2 characters')
-    .max(30, 'Title is too long')
+    .min(3, 'Title must be at least 2 characters')
+    .max(50, 'Title is too long')
     .required('Title is required'),
   content: Yup.string()
     .required('Content is required')
-    .max(200, 'Content is too long'),
+    .max(500, 'Content is too long'),
   tag: Yup.string()
     .oneOf(['Todo', 'Work', 'Personal', 'Meeting', 'Shopping'])
     .required('Tag is required'),
 });
 
-function NoteForm({ onClose }: NoteFormProps) {
+function NoteForm({ onClose, page }: NoteFormProps) {
   const fieldId = useId();
+  const queryClient = useQueryClient();
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (data: CreateNoteProps) => {
+      await createNote(data);
+    },
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notes', page] });
+    },
+
+    onError: error => {
+      console.error(error);
+    },
+  });
 
   const handleSubmit = (
     values: FormValuesProps,
     formikHelpers: FormikHelpers<FormValuesProps>
   ) => {
-    console.log(values);
+    mutate({
+      title: values.title,
+      content: values.content,
+      tag: values.tag,
+    });
     formikHelpers.resetForm();
     onClose();
   };
@@ -115,7 +130,7 @@ function NoteForm({ onClose }: NoteFormProps) {
               <button
                 type="submit"
                 className={css.submitButton}
-                disabled={!dirty || !isValid || isSubmitting}
+                disabled={!dirty || !isValid || isSubmitting || isPending}
               >
                 Create note
               </button>
