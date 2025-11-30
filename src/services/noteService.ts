@@ -46,10 +46,12 @@ export async function createNote(data: CreateNoteProps) {
 }
 
 export async function deleteNote(id: Note['id']) {
-  await axios.delete(`/notes/${id}`, {
+  const { data } = await axios.delete(`/notes/${id}`, {
     headers: {
       accept: 'application/json',
       Authorization: `Bearer ${NOTEHUB_TOKEN}`,
     },
   });
+
+  return data;
 }

@@ -29,7 +29,10 @@ function App() {
   });
 
   const handelSearchBox = useDebouncedCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value),
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSearch(e.target.value);
+      setPage(1);
+    },
     300
   );
 
@@ -38,7 +41,11 @@ function App() {
       <header className={css.toolbar}>
         <SearchBox search={search} onChange={handelSearchBox} />
         {isSuccess && data && data.totalPages > 1 && (
-          <Pagination data={data} setPage={setPage} page={page} />
+          <Pagination
+            totalPages={data.totalPages}
+            onPageChange={newPage => setPage(newPage)}
+            currentPage={page}
+          />
         )}
         {
           <button onClick={openModal} className={css.button}>
@@ -49,9 +56,7 @@ function App() {
       <main>
         {isError && <ErrorMessage error={error} />}
         {isLoading && <Loading />}
-        {isSuccess && data && data.totalPages > 1 && (
-          <NoteList notes={data.notes} />
-        )}
+        {isSuccess && data && <NoteList notes={data.notes} />}
       </main>
       {isModalOpen && (
         <Modal onClose={closeModal}>

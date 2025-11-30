@@ -5,11 +5,11 @@ import { deleteNote } from '../../services/noteService';
 import css from './NoteList.module.css';
 import type { Note } from '../../types/note';
 
-interface NoteProps {
+interface NoteListProps {
   notes: Note[];
 }
 
-function NoteList({ notes }: NoteProps) {
+function NoteList({ notes }: NoteListProps) {
   const queryClient = useQueryClient();
 
   const { mutate: deleteNoteM, isPending } = useMutation({
