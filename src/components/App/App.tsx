@@ -28,13 +28,10 @@ function App() {
     placeholderData: keepPreviousData,
   });
 
-  const handelSearchBox = useDebouncedCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setSearch(e.target.value);
-      setPage(1);
-    },
-    300
-  );
+  const handelSearchBox = useDebouncedCallback((value: string) => {
+    setSearch(value);
+    setPage(1);
+  }, 300);
 
   return (
     <div className={css.app}>

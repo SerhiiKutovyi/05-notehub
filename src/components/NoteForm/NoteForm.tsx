@@ -23,10 +23,7 @@ const OrderFormSchema = Yup.object().shape({
     .min(3, 'Title must be at least 3 characters')
     .max(50, 'Title is too long')
     .required('Title is required'),
-  content: Yup.string()
-    .optional()
-    .required('Content is required')
-    .max(500, 'Content is too long'),
+  content: Yup.string().optional().max(500, 'Content is too long'),
   tag: Yup.string()
     .oneOf(['Todo', 'Work', 'Personal', 'Meeting', 'Shopping'])
     .required('Tag is required'),
@@ -43,6 +40,7 @@ function NoteForm({ onClose, page }: NoteFormProps) {
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notes', page] });
+      onClose();
     },
 
     onError: error => {
@@ -60,7 +58,6 @@ function NoteForm({ onClose, page }: NoteFormProps) {
       tag: values.tag,
     });
     formikHelpers.resetForm();
-    onClose();
   };
 
   return (
